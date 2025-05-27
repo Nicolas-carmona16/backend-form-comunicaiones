@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario Integrado</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        #myForm {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #success-message {
+            display: none;
+            background-color: #dff0d8;
+            color: #3c763d;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<h1>Formulario de Contacto</h1>
+
+<form id="myForm">
+    <input type="text" id="name" placeholder="Nombre" required><br>
+    <input type="email" id="email" placeholder="Email" required><br>
+    <textarea id="message" placeholder="Tu mensaje" required></textarea><br>
+    <button type="submit">Enviar Mensaje</button>
+</form>
+
+<div id="success-message">
+    Mensaje enviado con exito.
+</div>
+
+<script>
+    document.getElementById("myForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        // Deshabilitar el botón durante el envío
+        submitButton.disabled = true;
+        submitButton.textContent = "Enviando...";
+
+        const data = {
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            message: document.getElementById("message").value
+        };
+
+        try {
+            const response = await fetch("/api/form", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                // Mostrar mensaje de éxito
+                document.getElementById("success-message").style.display = "block";
+                // Resetear el formulario
+                form.reset();
+                // Ocultar mensaje después de 5 segundos
+                setTimeout(() => {
+                    document.getElementById("success-message").style.display = "none";
+                }, 5000);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Ocurrió un error al enviar el formulario");
+        } finally {
+            // Restaurar el botón
+            submitButton.disabled = false;
+            submitButton.textContent = "Enviar Mensaje";
+        }
+    });
+</script>
+</body>
+</html>
